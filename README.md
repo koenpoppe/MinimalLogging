@@ -8,5 +8,7 @@ As developers, adding log statements seems easy and risk-free. However, with hun
 
 This topic was presented on 
 
+- [Meeting C++, November 12th, 2023](https://meetingcpp.com/2023/Talks/items/Minimal_Logging_Framework_in_Cpp_20.html)
+	- [Handout](Presentations/2023-11-12 Minimal Logging Meeting C++.pdf)
 - [BeC++ User Group meeting, June 28th, 2022] http://becpp.org/blog/2022/06/02/next-becpp-ug-meeting-planned-for-june-28th-2022/
 	- [Handout](Presentations/2022-06-28 Minimal Logging in C++ 20.pdf)
