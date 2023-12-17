@@ -17,6 +17,11 @@ private slots:
     void resolveFunctionSingle();
     void resolveFunctionsNested();
 
+    void traceWithBool();
+    void traceWithInt();
+    void traceWithUnsignedInt();
+    void traceWithFloat();
+
 public:
     static const std::string s_symbolFilePath;
 };

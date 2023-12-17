@@ -66,13 +66,22 @@ class Logger
 public:
     void trace() __attribute__((always_inline))
     {
-        m_circularBuffer.append(Record{now(), instructionPointer()});
+        traceInner(instructionPointer());
+    }
+    inline void traceInner(const uintptr_t traceCallSite)__attribute__((noinline, used))
+    {
+        m_circularBuffer.append(Record{now(), traceCallSite, instructionPointer()});
     }
 
     template <typename T>
-    void trace(const T t)
+    void trace(const T t) __attribute__((always_inline))
     {
-        m_circularBuffer.append(RecordT<T>{now(), instructionPointer(), t});
+        traceInner(instructionPointer(), t);
+    }
+    template <typename T>
+    inline void traceInner(const uintptr_t traceCallSite, const T t) __attribute__((noinline, used))
+    {
+        m_circularBuffer.append(RecordT<T>{now(), traceCallSite, instructionPointer(), t});
     }
 
     static inline uintptr_t instructionPointer() __attribute__((always_inline))
@@ -87,6 +96,7 @@ public:
 #endif
         return ip;
     }
+
     using Clock = std::chrono::high_resolution_clock;
     using TimeUnit = std::chrono::nanoseconds;
     static inline TimeUnit::rep now()
@@ -99,6 +109,7 @@ private:
     {
         const TimeUnit::rep m_time;
         const uintptr_t m_traceCallSite; /// where is trace called from?
+        const uintptr_t m_traceInnerInstance; /// what templated form?
     };
 
     template <typename T>
