@@ -68,6 +68,18 @@ public:
     {
         m_circularBuffer.append(Record{now()});
     }
+    static inline uintptr_t instructionPointer() __attribute__((always_inline))
+    {
+        uintptr_t ip;
+#ifdef ARM
+        asm volatile("ADR %0, ." : "=r"(ip));
+#elifdef X86
+        asm volatile("lea (%%rip),%0" : "=r"(ip));
+#else
+        static_assert(false, "No implementation to retrieve the instruction pointer");
+#endif
+        return ip;
+    }
     using Clock = std::chrono::high_resolution_clock;
     using TimeUnit = std::chrono::nanoseconds;
     static inline TimeUnit::rep now()
