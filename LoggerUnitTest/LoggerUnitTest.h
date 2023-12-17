@@ -15,6 +15,7 @@ private slots:
     void timeInfo();
 
     void resolveFunctionSingle();
+    void resolveFunctionsNested();
 
 public:
     static const std::string s_symbolFilePath;

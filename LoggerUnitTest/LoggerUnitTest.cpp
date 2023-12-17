@@ -130,4 +130,57 @@ void LoggerUnitTest::resolveFunctionSingle()
     resolveFunctionSingleImpl<Logger<512u>>();
 }
 
+template <typename L>
+struct ResolveFunctionTestClass
+{
+    L logger;
+    void first() __attribute__((noinline))
+    {
+        logger.trace();
+        second();
+        logger.trace();
+    }
+    void second() __attribute__((noinline))
+    {
+        logger.trace();
+    }
+};
+template <typename Logger>
+void resolveFunctionsNestedImpl()
+{
+    if constexpr (requires(Logger l) { l.trace(); })
+    {
+        // Test program
+        ResolveFunctionTestClass<Logger> test;
+        test.first();
+
+        // Serialize
+        const std::string data = serialize(test.logger);
+        QCOMPARE(data.size(), 3*(sizeof(typename Logger::TimeUnit::rep) + sizeof(uintptr_t)));
+
+        // Check output
+        try
+        {
+            const LogModel model(std::istringstream{data}, LoggerUnitTest::s_symbolFilePath);
+            const std::vector<LogModel::Record> &records = model.records();
+            QCOMPARE(records.size(), 3u);
+            QCONTAINS(model.resolveFunction(records.at(0).address), "::first");
+            QCONTAINS(model.resolveFunction(records.at(1).address), "::second");
+            QCONTAINS(model.resolveFunction(records.at(2).address), "::first");
+        }
+        catch (const std::exception &e)
+        {
+            QFAIL(e.what());
+        }
+    }
+    else
+    {
+        QFAIL("Does not compile");
+    }
+}
+void LoggerUnitTest::resolveFunctionsNested()
+{
+    resolveFunctionsNestedImpl<Logger<512u>>();
+}
+
 QTEST_APPLESS_MAIN(LoggerUnitTest)
