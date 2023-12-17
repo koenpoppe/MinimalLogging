@@ -68,6 +68,13 @@ public:
     {
         m_circularBuffer.append(Record{now(), instructionPointer()});
     }
+
+    template <typename T>
+    void trace(const T t)
+    {
+        m_circularBuffer.append(RecordT<T>{now(), instructionPointer(), t});
+    }
+
     static inline uintptr_t instructionPointer() __attribute__((always_inline))
     {
         uintptr_t ip;
@@ -92,6 +99,12 @@ private:
     {
         const TimeUnit::rep m_time;
         const uintptr_t m_traceCallSite; /// where is trace called from?
+    };
+
+    template <typename T>
+    struct __attribute__((packed)) RecordT : Record
+    {
+        T t;
     };
 
     // Buffer
