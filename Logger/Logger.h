@@ -57,6 +57,11 @@ private:
     bool m_bufferFull = false;
 };
 
+template <typename... Ts>
+struct LoggerTraceTypeInfo
+{
+    static void tag(){}
+};
 } // namespace Details
 
 template <std::size_t sizeLog2>
@@ -67,12 +72,7 @@ public:
     template <typename... Ts>
     void trace(const Ts... args) __attribute__((always_inline))
     {
-        traceInner(instructionPointer(), args...);
-    }
-    template <typename... Ts>
-    inline void __attribute__((noinline, used)) traceInner(const uintptr_t traceCallSite, const Ts... args)
-    {
-        m_circularBuffer.append(RecordT<Ts...>{now(), traceCallSite, instructionPointer(), args...});
+        m_circularBuffer.append(RecordT<Ts...>{now(), instructionPointer(), reinterpret_cast<uintptr_t>(&Details::LoggerTraceTypeInfo<Ts...>::tag), args...});
     }
 
     static inline uintptr_t instructionPointer() __attribute__((always_inline))
