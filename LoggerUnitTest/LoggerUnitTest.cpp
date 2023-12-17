@@ -365,4 +365,45 @@ void LoggerUnitTest::traceWithFloat()
 {
     traceWithFloatImpl<Logger<512u>>();
 }
+
+template <typename Logger>
+void traceMultiImpl()
+{
+    if constexpr (requires(Logger l) { l.template trace<bool, int, float>({}, {}, {}); })
+    {
+        // Test
+        Logger logger;
+        logger.trace(true, 42, 3.14159f);
+
+        // Serialize
+        const std::string data = serialize(logger);
+
+        // Check output
+        try
+        {
+            const LogModel model(std::istringstream{data}, LoggerUnitTest::s_symbolFilePath);
+            const std::vector<LogModel::Record> &records = model.records();
+            QCOMPARE(records.size(), 1u);
+
+            const LogModel::Record first = records.at(0);
+            QCOMPARE(first.args.size(), 3u);
+            QCOMPARE(std::any_cast<bool>(first.args.at(0)), true);
+            QCOMPARE(std::any_cast<int>(first.args.at(1)), 42);
+            QCOMPARE(std::any_cast<float>(first.args.at(2)), 3.14159f);
+        }
+        catch (const std::exception &e)
+        {
+            QFAIL(e.what());
+        }
+    }
+    else
+    {
+        QFAIL("Does not compile");
+    }
+}
+void LoggerUnitTest::traceMulti()
+{
+    traceMultiImpl<Logger<512u>>();
+}
+
 QTEST_APPLESS_MAIN(LoggerUnitTest)

@@ -64,24 +64,15 @@ class Logger
 {
     // Logging
 public:
-    void trace() __attribute__((always_inline))
+    template <typename... Ts>
+    void trace(const Ts... args) __attribute__((always_inline))
     {
-        traceInner(instructionPointer());
+        traceInner(instructionPointer(), args...);
     }
-    inline void traceInner(const uintptr_t traceCallSite)__attribute__((noinline, used))
+    template <typename... Ts>
+    inline void __attribute__((noinline, used)) traceInner(const uintptr_t traceCallSite, const Ts... args)
     {
-        m_circularBuffer.append(Record{now(), traceCallSite, instructionPointer()});
-    }
-
-    template <typename T>
-    void trace(const T t) __attribute__((always_inline))
-    {
-        traceInner(instructionPointer(), t);
-    }
-    template <typename T>
-    inline void traceInner(const uintptr_t traceCallSite, const T t) __attribute__((noinline, used))
-    {
-        m_circularBuffer.append(RecordT<T>{now(), traceCallSite, instructionPointer(), t});
+        m_circularBuffer.append(RecordT<Ts...>{now(), traceCallSite, instructionPointer(), args...});
     }
 
     static inline uintptr_t instructionPointer() __attribute__((always_inline))
@@ -105,17 +96,33 @@ public:
     }
 
 private:
-    struct Record
+    struct __attribute__((packed)) Record
     {
         const TimeUnit::rep m_time;
         const uintptr_t m_traceCallSite; /// where is trace called from?
         const uintptr_t m_traceInnerInstance; /// what templated form?
     };
 
-    template <typename T>
-    struct __attribute__((packed)) RecordT : Record
+    template <std::size_t I, typename T>
+    struct __attribute__((packed)) RecordArg
     {
-        T t;
+        T arg;
+    };
+
+    template <typename...>
+    struct __attribute__((packed)) RecordT;
+    template <std::size_t... Is, typename... Ts>
+    struct __attribute__((packed)) RecordT<std::index_sequence<Is...>, Ts...> : Record, RecordArg<Is, Ts>...
+    {
+        RecordT(const TimeUnit::rep time, uintptr_t callerLocation, uintptr_t traceLocation, const Ts... args)
+            : Record{time, callerLocation, traceLocation}, RecordArg<Is, Ts>{args}...
+        {
+        }
+    };
+    template <typename... Ts>
+    struct RecordT : RecordT<std::make_index_sequence<sizeof...(Ts)>, Ts...>
+    {
+        using RecordT<std::make_index_sequence<sizeof...(Ts)>, Ts...>::RecordT;
     };
 
     // Buffer

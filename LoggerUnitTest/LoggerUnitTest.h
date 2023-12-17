@@ -22,6 +22,8 @@ private slots:
     void traceWithUnsignedInt();
     void traceWithFloat();
 
+    void traceMulti();
+
 public:
     static const std::string s_symbolFilePath;
 };
