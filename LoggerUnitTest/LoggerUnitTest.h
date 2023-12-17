@@ -9,6 +9,8 @@ class LoggerUnitTest : public QObject
 
 private slots:
     void unsupportedTest();
+
+    void timeInfo();
 };
 
 #endif // LOGGER_UNIT_TEST_H

@@ -6,3 +6,5 @@ HEADERS += LoggerUnitTest.h
 SOURCES += LoggerUnitTest.cpp
 
 HEADERS += ../Logger/Logger.h
+
+include("../Private/Private.pri")
