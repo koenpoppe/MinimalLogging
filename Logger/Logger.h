@@ -64,9 +64,9 @@ class Logger
 {
     // Logging
 public:
-    void trace()
+    void trace() __attribute__((always_inline))
     {
-        m_circularBuffer.append(Record{now()});
+        m_circularBuffer.append(Record{now(), instructionPointer()});
     }
     static inline uintptr_t instructionPointer() __attribute__((always_inline))
     {
@@ -91,6 +91,7 @@ private:
     struct Record
     {
         const TimeUnit::rep m_time;
+        const uintptr_t m_traceCallSite; /// where is trace called from?
     };
 
     // Buffer
