@@ -48,7 +48,7 @@ void unsupportedTestImpl(auto logger)
 }
 void LoggerUnitTest::unsupportedTest()
 {
-    unsupportedTestImpl(Logger<512u>{});
+    unsupportedTestImpl(Logger<0u>{});
 }
 
 template <typename Logger>
@@ -91,7 +91,7 @@ void timeInfoImpl()
 }
 void LoggerUnitTest::timeInfo()
 {
-    timeInfoImpl<Logger<512u>>();
+    timeInfoImpl<Logger<6u>>();
 }
 
 template <typename Logger>
@@ -127,7 +127,7 @@ void resolveFunctionSingleImpl()
 }
 void LoggerUnitTest::resolveFunctionSingle()
 {
-    resolveFunctionSingleImpl<Logger<512u>>();
+    resolveFunctionSingleImpl<Logger<5u>>();
 }
 
 template <typename L>
@@ -180,7 +180,7 @@ void resolveFunctionsNestedImpl()
 }
 void LoggerUnitTest::resolveFunctionsNested()
 {
-    resolveFunctionsNestedImpl<Logger<512u>>();
+    resolveFunctionsNestedImpl<Logger<7u>>();
 }
 
 template <typename Logger>
@@ -225,7 +225,7 @@ void traceWithBoolImpl()
 }
 void LoggerUnitTest::traceWithBool()
 {
-    traceWithBoolImpl<Logger<512u>>();
+    traceWithBoolImpl<Logger<6u>>();
 }
 
 template <typename Logger>
@@ -271,7 +271,7 @@ void traceWithIntImpl()
 }
 void LoggerUnitTest::traceWithInt()
 {
-    traceWithIntImpl<Logger<512u>>();
+    traceWithIntImpl<Logger<7u>>();
 }
 
 template <typename Logger>
@@ -320,7 +320,7 @@ void traceWithUnsignedIntImpl()
 }
 void LoggerUnitTest::traceWithUnsignedInt()
 {
-    traceWithUnsignedIntImpl<Logger<512u>>();
+    traceWithUnsignedIntImpl<Logger<8u>>();
 }
 
 template <typename Logger>
@@ -363,7 +363,7 @@ void traceWithFloatImpl()
 }
 void LoggerUnitTest::traceWithFloat()
 {
-    traceWithFloatImpl<Logger<512u>>();
+    traceWithFloatImpl<Logger<7u>>();
 }
 
 template <typename Logger>
@@ -403,7 +403,7 @@ void traceMultiImpl()
 }
 void LoggerUnitTest::traceMulti()
 {
-    traceMultiImpl<Logger<512u>>();
+    traceMultiImpl<Logger<6u>>();
 }
 
 QTEST_APPLESS_MAIN(LoggerUnitTest)

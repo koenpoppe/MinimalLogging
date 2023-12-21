@@ -13,7 +13,7 @@ template <std::size_t sizeLog2>
 class CircularBuffer
 {
 public:
-    static constexpr std::size_t bufferSize = 2 ^ sizeLog2;
+    static constexpr std::size_t bufferSize = 1 << sizeLog2;
 
     void clear()
     {
