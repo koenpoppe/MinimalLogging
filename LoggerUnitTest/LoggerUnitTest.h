@@ -17,6 +17,8 @@ private slots:
     void resolveFunctionSingle();
     void resolveFunctionsNested();
 
+    void traceTriviallyCopyable();
+
     void traceWithBool();
     void traceWithInt();
     void traceWithUnsignedInt();

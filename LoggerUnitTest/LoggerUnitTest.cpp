@@ -184,6 +184,44 @@ void LoggerUnitTest::resolveFunctionsNested()
 }
 
 template <typename Logger>
+void traceTriviallyCopyableImpl()
+{
+    if constexpr (requires(Logger l) { l.template trace<bool>({}); })
+    {
+        Logger logger;
+        {
+            using Argument = int;
+            static_assert(std::is_trivially_copyable_v<Argument>);
+            QVERIFY(requires { logger.trace(Argument{}); });
+        }
+        {
+            struct Argument
+            {
+                int foo = 42;
+            };
+            static_assert(std::is_trivially_copyable_v<Argument>);
+            QVERIFY(requires { logger.trace(Argument{}); });
+        }
+        {
+            struct Argument
+            {
+                virtual ~Argument() {}
+            };
+            static_assert(!std::is_trivially_copyable_v<Argument>);
+            QVERIFY(!requires { logger.trace(Argument{}); });
+        }
+    }
+    else
+    {
+        QFAIL("Does not compile");
+    }
+}
+void LoggerUnitTest::traceTriviallyCopyable()
+{
+    traceTriviallyCopyableImpl<Logger<7u>>();
+}
+
+template <typename Logger>
 void traceWithBoolImpl()
 {
     if constexpr (requires(Logger l) { l.template trace<bool>({}); })

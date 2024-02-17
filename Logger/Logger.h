@@ -6,6 +6,10 @@
 #include <chrono>
 #include <cstring>
 #include <ostream>
+#include <type_traits>
+
+template <typename T>
+concept TriviallyCopyable = std::is_trivially_copyable_v<T>;
 
 namespace Details
 {
@@ -20,7 +24,7 @@ public:
         m_nonModTail = 0u;
         m_bufferFull = false;
     }
-    template <typename T>
+    template <TriviallyCopyable T>
     void append(const T t)
     {
         // NOTE: compiler will replace module power-of-2 by non-branching AND
@@ -69,7 +73,7 @@ class Logger
 {
     // Logging
 public:
-    template <typename... Ts>
+    template <TriviallyCopyable... Ts>
     void trace(const Ts... args) __attribute__((always_inline))
     {
         m_circularBuffer.append(RecordT<Ts...>{now(), instructionPointer(), reinterpret_cast<uintptr_t>(&Details::LoggerTraceTypeInfo<Ts...>::tag), args...});
@@ -103,15 +107,15 @@ private:
         const uintptr_t m_traceInnerInstance; /// what templated form?
     };
 
-    template <std::size_t I, typename T>
+    template <std::size_t I, TriviallyCopyable T>
     struct __attribute__((packed)) RecordArg
     {
         T arg;
     };
 
-    template <typename...>
+    template <TriviallyCopyable...>
     struct __attribute__((packed)) RecordT;
-    template <std::size_t... Is, typename... Ts>
+    template <std::size_t... Is, TriviallyCopyable... Ts>
     struct __attribute__((packed)) RecordT<std::index_sequence<Is...>, Ts...> : Record, RecordArg<Is, Ts>...
     {
         RecordT(const TimeUnit::rep time, uintptr_t callerLocation, uintptr_t traceLocation, const Ts... args)
@@ -119,7 +123,7 @@ private:
         {
         }
     };
-    template <typename... Ts>
+    template <TriviallyCopyable... Ts>
     struct RecordT : RecordT<std::make_index_sequence<sizeof...(Ts)>, Ts...>
     {
         using RecordT<std::make_index_sequence<sizeof...(Ts)>, Ts...>::RecordT;
