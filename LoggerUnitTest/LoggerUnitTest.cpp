@@ -210,6 +210,12 @@ void traceTriviallyCopyableImpl()
             static_assert(!std::is_trivially_copyable_v<Argument>);
             QVERIFY(!requires { logger.trace(Argument{}); });
         }
+        {
+            const char *str = "const char*";
+            static_assert(std::is_trivially_copyable_v<decltype(str)>);
+            static_assert(std::is_pointer_v<decltype(str)>);
+            QVERIFY(!requires { logger.trace("const char*"); });
+        }
     }
     else
     {
